@@ -1,10 +1,11 @@
-import React, { memo } from "react";
+import React, { PropsWithChildren, memo } from "react";
 import { Image, StyleSheet } from "react-native";
 
-const Logo = () => (
+const Logo = ({ width }: { width?: number }) => (
   <Image
     source={require("@/assets/images/logo-icon.png")}
-    style={styles.image}
+    style={[styles.image]}
+    width={width}
   />
 );
 
@@ -12,7 +13,7 @@ const styles = StyleSheet.create({
   image: {
     width: 128,
     height: 128,
-    objectFit: "cover",
+    objectFit: "contain",
     marginBottom: 0,
   },
 });

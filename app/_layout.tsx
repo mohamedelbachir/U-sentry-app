@@ -11,7 +11,9 @@ const RootLayout = () => {
   const colorScheme = systemColorScheme;
   return (
     <PaperProvider theme={theme[colorScheme]}>
-      <Stack screenOptions={{ animation: "slide_from_right" }} />
+      <AuthProvider>
+        <Stack screenOptions={{ animation: "slide_from_right" }} />
+      </AuthProvider>
     </PaperProvider>
   );
 };

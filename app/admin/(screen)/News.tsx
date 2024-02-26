@@ -1,43 +1,53 @@
-import { View, StyleSheet, ScrollView, Text } from "react-native";
+import { View, StyleSheet, ScrollView, Text, Pressable } from "react-native";
 import React from "react";
 import ScreenWrapper from "@/utils/screenWrapper";
-import { Appbar, Chip, FAB } from "react-native-paper";
+import { Card, Button, FAB, useTheme } from "react-native-paper";
 import { router } from "expo-router";
-
+import CardPost from "@/components/CardPox";
+import { postType } from "@/utils/types";
+const data: postType[] = [
+  {
+    id: 0,
+    title: "Winter transfer window",
+    content: "",
+    description:
+      "Which soccer players are switching teams? From the Premier League, La Liga and beyond",
+    image: "",
+  },
+  {
+    id: 2,
+    title: "Winter ",
+    content: "",
+    description:
+      "Which ching teams? From the Premier League, La Liga and beyond",
+    image: "",
+  },
+  {
+    id: 3,
+    title: "lol ",
+    content: "",
+    description: "Which chinr League, La Liga and beyond",
+    image: "",
+  },
+];
 const News = () => {
+  const theme = useTheme();
   return (
     <>
       <ScreenWrapper>
         <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          style={styles.chipsContainer}
-          contentContainerStyle={styles.chipsContent}
+          style={[
+            styles.container,
+            { backgroundColor: theme.colors?.background },
+          ]}
+          contentContainerStyle={styles.content}
         >
-          <Chip
-            selected
-            onPress={() => {}}
-            style={styles.chip}
-            showSelectedOverlay
-          >
-            Latest
-          </Chip>
-          <Chip onPress={() => {}} style={styles.chip}>
-            Popular
-          </Chip>
-          <Chip onPress={() => {}} style={styles.chip}>
-            Interviews
-          </Chip>
-          <Chip onPress={() => {}} style={styles.chip}>
-            Transfers
-          </Chip>
-          <Chip onPress={() => {}} style={styles.chip}>
-            League
-          </Chip>
+          {data.map((d, i) => (
+            <CardPost key={i} {...d} />
+          ))}
         </ScrollView>
-        <Text>Hello world</Text>
-        <View style={styles.cardContainer}>
-          {/* 
+
+        {/* 
       <Card style={styles.card} mode="elevated">
         <Card.Cover source={require("@/assets/images/players.jpg")} />
         <Card.Title
@@ -74,7 +84,6 @@ const News = () => {
         </Card.Actions>
       </Card>
      */}
-        </View>
       </ScreenWrapper>
       <FAB
         icon="magnify"
@@ -88,45 +97,40 @@ const News = () => {
   );
 };
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
   },
-  winner: {
-    fontWeight: "700",
+  content: {
+    padding: 4,
   },
-  listRow: {
+  card: {
+    margin: 4,
+  },
+  chip: {
+    margin: 4,
+  },
+  preference: {
+    alignItems: "center",
     flexDirection: "row",
-    marginVertical: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
   },
-  teamResultRow: {
-    flex: 1,
-    justifyContent: "space-between",
-    flexDirection: "row",
+  button: {
+    borderRadius: 12,
   },
-  score: {
-    marginRight: 16,
+  customCardRadius: {
+    borderTopLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
+  customCoverRadius: {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 24,
   },
   fab: {
     position: "absolute",
     bottom: 16,
     right: 16,
-  },
-  card: {
-    marginHorizontal: 8,
-    marginBottom: 8,
-  },
-  cardContainer: {
-    marginBottom: 80,
-  },
-  chipsContainer: {
-    flexDirection: "row",
-  },
-  chipsContent: {
-    paddingLeft: 8,
-    paddingVertical: 8,
-  },
-  chip: {
-    marginRight: 8,
   },
 });
 export default News;

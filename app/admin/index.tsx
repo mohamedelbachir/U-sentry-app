@@ -31,10 +31,9 @@ const Admin = () => {
   const [routes] = React.useState<RoutesState>([
     {
       key: "alerte",
-      title: "Alertes",
+      title: "Actu",
       titleInfo: "Actualites",
-      focusedIcon: "newspaper-variant",
-      unfocusedIcon: "newspaper-variant-outline",
+      focusedIcon: "broadcast",
       badge: false,
     },
     {
@@ -59,10 +58,12 @@ const Admin = () => {
       {index != 2 && (
         <Appbar.Header elevated>
           <Appbar.Content title={routes[index].titleInfo} />
-          <Appbar.Action
-            icon={"bookmark-outline"}
-            onPress={() => router.push("/admin/(screen)/Favorite")}
-          />
+          {index == 0 && (
+            <Appbar.Action
+              icon={"bookmark-outline"}
+              onPress={() => router.push("/admin/(screen)/Favorite")}
+            />
+          )}
         </Appbar.Header>
       )}
       <BottomNavigation

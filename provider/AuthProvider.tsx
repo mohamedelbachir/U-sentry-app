@@ -23,7 +23,9 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     };
     fetchSession();
   }, []);
-  return <AuthContext.Provider value={{ session }}></AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>
+  );
 }
 
 export const useAuth = () => useContext(AuthContext);
