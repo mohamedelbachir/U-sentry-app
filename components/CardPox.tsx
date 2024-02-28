@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { Card } from "react-native-paper";
 import { postType } from "@/utils/types";
 
-const CardPost = ({ id, title, description, image }: postType) => {
+const CardPost = ({ title, id, description, imageURL }: postType) => {
   return (
     <Pressable onPress={() => router.push(`/admin/post/${id}`)}>
       <Card style={styles.card} mode="elevated">

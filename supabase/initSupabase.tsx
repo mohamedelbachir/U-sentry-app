@@ -1,5 +1,6 @@
 import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Database } from "./supabase";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseURL = "https://jpgbhncvkbrgjirszsal.supabase.co";
@@ -31,9 +32,9 @@ const ExpoStorage = {
     }
   },
 };
-export const supabase = createClient(supabaseURL, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseURL, supabaseAnonKey, {
   auth: {
-    storage: ExpoStorage,
+    storage: AsyncStorage as any,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

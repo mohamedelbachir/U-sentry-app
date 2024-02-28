@@ -1,63 +1,130 @@
-import React, { memo, useState } from "react";
-import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
+import React, { memo, useEffect, useState } from "react";
+import { TouchableOpacity, StyleSheet, Text, View, Alert } from "react-native";
 import Background from "@/components/Background";
 import Logo from "@/components/Logo";
 import Header from "@/components/Header";
 import Button from "@/components/Button";
 import TextInput from "@/components/TextInput";
 import BackButton from "@/components/BackButton";
-import { useTheme } from "react-native-paper";
+import { ActivityIndicator, useTheme } from "react-native-paper";
 import DropDown from "react-native-paper-dropdown";
 import { emailValidator, passwordValidator } from "@/utils/utils";
 import { Stack, router } from "expo-router";
+import { supabase } from "@/supabase/initSupabase";
+import { isWeb } from "@/utils/utility";
+import {
+  useDepartementList,
+  useFaculteList,
+  useFiliereList,
+  useNiveauList,
+} from "./api/info";
+import { useCreateUserClasseMutation } from "./api/account";
+
+type optionProps = {
+  label: string;
+  value: string;
+};
 
 const login = () => {
   const theme = useTheme();
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-
-  const _onLoginPressed = () => {
+  const [showFacultyDropDown, setShowFacultyDropDown] = useState(false);
+  const [showDepartementDropDown, setShowDepartementDropDown] = useState(false);
+  const [showFiliereDropDown, setShowFiliereDropDown] = useState(false);
+  const [showNiveauDropDown, setShowNiveauDropDown] = useState(false);
+  const [faculty, setFaculty] = useState<string>("");
+  const [departement, setDepartement] = useState<string>("");
+  const [filiere, setFiliere] = useState<string>("");
+  const [niveau, setNiveau] = useState<string>("");
+  const faculteData = useFaculteList();
+  const departementData = useDepartementList();
+  const niveauData = useNiveauList();
+  const filiereData = useFiliereList();
+  const handlePress = () => {
+    setStep((s) => s + 1);
+  };
+  const checkSignUp = () => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
+
     if (emailError || passwordError) {
       setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
+      setStep(0);
       return;
     }
-    //navigation.navigate('Dashboard');
-  };
-  const [showDropDown, setShowDropDown] = useState(false);
-  const [gender, setGender] = useState<string>("");
-  const [showMultiSelectDropDown, setShowMultiSelectDropDown] = useState(false);
-  const [colors, setColors] = useState<string>("");
-  const handlePress = () => {
-    if (step < 1) {
-      setStep((s) => s + 1);
+    if (
+      faculty === "" ||
+      departement === "" ||
+      niveau === "" ||
+      filiere === ""
+    ) {
+      setStep(0);
+      return;
     }
-    router.navigate("/admin");
+    handleSignUp()
+      .then(() => {
+        router.navigate("/admin");
+      })
+      .catch((e) => {
+        setStep(0);
+      });
   };
-  const genderList = [
-    {
-      label: "Male",
-      value: "male",
-    },
-    {
-      label: "Female",
-      value: "female",
-    },
-    {
-      label: "Others",
-      value: "others",
-    },
-  ];
 
+  const facultyList: optionProps[] = faculteData.data?.map((d) => ({
+    label: d.nom,
+    value: d.faculte_id,
+  }));
+  const departementList: optionProps[] = departementData.data?.map((d) => ({
+    label: d.nom,
+    value: d.departement_id,
+  }));
+  const niveauList: optionProps[] = niveauData.data?.map((d) => ({
+    label: d.nom,
+    value: d.id,
+  }));
+  const filiereList: optionProps[] = filiereData.data?.map((d) => ({
+    label: d.nom,
+    value: d.id,
+  }));
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    const { error, data } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+    });
+    if (error) {
+      Alert.alert(error.message);
+      if (isWeb) console.log(error.message);
+    } else {
+      //
+    }
+    setLoading(false);
+  };
+  if (
+    filiereData.isLoading ||
+    niveauData.isLoading ||
+    faculteData.isLoading ||
+    departementData.isLoading
+  ) {
+    return (
+      <View style={{ flex: 1, alignItems: "center" }}>
+        <Stack.Screen options={{ headerShown: false }} />
+        <ActivityIndicator size={"large"} style={{ flex: 1 }} />
+      </View>
+    );
+  }
   return (
     <Background>
       <Stack.Screen
         options={{
           title: "sign up",
           headerShown: false,
+          animation: "slide_from_right",
         }}
       />
       <BackButton goBack={() => router.back()} />
@@ -93,12 +160,12 @@ const login = () => {
             <DropDown
               label={"choisir votre faculte"}
               mode={"flat"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={gender}
-              setValue={setGender}
-              list={genderList}
+              visible={showFacultyDropDown}
+              showDropDown={() => setShowFacultyDropDown(true)}
+              onDismiss={() => setShowFacultyDropDown(false)}
+              value={faculty}
+              setValue={setFaculty}
+              list={facultyList}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -110,12 +177,12 @@ const login = () => {
             <DropDown
               label={"choisir votre departement"}
               mode={"flat"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={gender}
-              setValue={setGender}
-              list={genderList}
+              visible={showDepartementDropDown}
+              showDropDown={() => setShowDepartementDropDown(true)}
+              onDismiss={() => setShowDepartementDropDown(false)}
+              value={departement}
+              setValue={setDepartement}
+              list={departementList}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -123,12 +190,12 @@ const login = () => {
             <DropDown
               label={"choisir votre filiere"}
               mode={"flat"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={gender}
-              setValue={setGender}
-              list={genderList}
+              visible={showFiliereDropDown}
+              showDropDown={() => setShowFiliereDropDown(true)}
+              onDismiss={() => setShowFiliereDropDown(false)}
+              value={filiere}
+              setValue={setFiliere}
+              list={filiereList}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -136,12 +203,12 @@ const login = () => {
             <DropDown
               label={"choisir votre niveau"}
               mode={"flat"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={gender}
-              setValue={setGender}
-              list={genderList}
+              visible={showNiveauDropDown}
+              showDropDown={() => setShowNiveauDropDown(true)}
+              onDismiss={() => setShowNiveauDropDown(false)}
+              value={niveau}
+              setValue={setNiveau}
+              list={niveauList}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -151,18 +218,18 @@ const login = () => {
         {step == 1 && (
           <Button
             mode="outlined"
-            onPress={_onLoginPressed}
             style={{ borderRadius: 30, width: "auto" }}
-            onPressIn={() => setStep((s) => s - 1)}
+            onPress={() => setStep((s) => s - 1)}
+            disabled={loading}
           >
             Retour
           </Button>
         )}
         <Button
           mode="contained"
-          onPress={_onLoginPressed}
+          onPress={() => (step == 0 ? handlePress() : checkSignUp())}
+          loading={loading}
           style={{ borderRadius: 30, width: step == 1 ? "auto" : "100%" }}
-          onPressIn={handlePress}
         >
           {step === 0 ? "Suivant" : "Creer votre compte"}
         </Button>

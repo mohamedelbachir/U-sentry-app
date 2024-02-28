@@ -1,51 +1,35 @@
 import { View, StyleSheet, ScrollView, Text, Pressable } from "react-native";
 import React from "react";
 import ScreenWrapper from "@/utils/screenWrapper";
-import { Card, Button, FAB, useTheme } from "react-native-paper";
+import {
+  Card,
+  Button,
+  FAB,
+  useTheme,
+  ActivityIndicator,
+} from "react-native-paper";
 import { router } from "expo-router";
 import CardPost from "@/components/CardPox";
 import { postType } from "@/utils/types";
-const data: postType[] = [
-  {
-    id: 0,
-    title: "Winter transfer window",
-    content: "",
-    description:
-      "Which soccer players are switching teams? From the Premier League, La Liga and beyond",
-    image: "",
-  },
-  {
-    id: 2,
-    title: "Winter ",
-    content: "",
-    description:
-      "Which ching teams? From the Premier League, La Liga and beyond",
-    image: "",
-  },
-  {
-    id: 3,
-    title: "lol ",
-    content: "",
-    description: "Which chinr League, La Liga and beyond",
-    image: "",
-  },
-];
+import { usePostList } from "@/app/api/post";
 const News = () => {
   const theme = useTheme();
+  const postData = usePostList();
   return (
     <>
       <ScreenWrapper>
-        <ScrollView
-          style={[
-            styles.container,
-            { backgroundColor: theme.colors?.background },
-          ]}
-          contentContainerStyle={styles.content}
-        >
-          {data.map((d, i) => (
-            <CardPost key={i} {...d} />
-          ))}
-        </ScrollView>
+        {postData.isLoading && <ActivityIndicator size={"large"} />}
+        {postData.data && (
+          <ScrollView
+            style={[
+              styles.container,
+              { backgroundColor: theme.colors?.background },
+            ]}
+            contentContainerStyle={styles.content}
+          >
+            <CardPost description={"lorem ipsu ...."} title="simple " id={1} />
+          </ScrollView>
+        )}
 
         {/* 
       <Card style={styles.card} mode="elevated">
