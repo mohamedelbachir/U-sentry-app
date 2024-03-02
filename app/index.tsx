@@ -1,13 +1,11 @@
 import React, { memo } from "react";
-import { StyleSheet, ActivityIndicator, View, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import Background from "@/components/Background";
 import Logo from "@/components/Logo";
-import Header from "@/components/Header";
 import Button from "@/components/Button";
 import Paragraph from "@/components/Paragraph";
 import { Redirect, Stack, router } from "expo-router";
-import { useTheme } from "react-native-paper";
-import ScreenWrapper from "@/utils/screenWrapper";
+import { useTheme, ActivityIndicator } from "react-native-paper";
 import { useAuth } from "@/provider/AuthProvider";
 
 const WelcomeScreen = () => {
@@ -15,16 +13,16 @@ const WelcomeScreen = () => {
   const { session, loading } = useAuth();
   if (loading) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-        />
-        <View style={{ flex: 1 }}>
-          <ActivityIndicator />
-        </View>
-      </>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "white",
+        }}
+      >
+        <ActivityIndicator size={"large"} />
+      </View>
     );
   }
   if (session != null) {

@@ -6,19 +6,18 @@ import Header from "@/components/Header";
 import Button from "@/components/Button";
 import TextInput from "@/components/TextInput";
 import BackButton from "@/components/BackButton";
-import { ActivityIndicator, useTheme } from "react-native-paper";
+import { useTheme } from "react-native-paper";
 import DropDown from "react-native-paper-dropdown";
 import { emailValidator, passwordValidator } from "@/utils/utils";
 import { Stack, router } from "expo-router";
-import { supabase } from "@/supabase/initSupabase";
-import { isWeb } from "@/utils/utility";
 import {
   useDepartementList,
-  useFaculteList,
+  useFacultyList,
   useFiliereList,
   useNiveauList,
 } from "./api/info";
-import { useCreateUserClasseMutation } from "./api/account";
+import { CreateUser } from "./api/account";
+import { useAuth } from "@/provider/AuthProvider";
 
 type optionProps = {
   label: string;
@@ -26,6 +25,7 @@ type optionProps = {
 };
 
 const login = () => {
+  const { setSession } = useAuth();
   const theme = useTheme();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -35,14 +35,136 @@ const login = () => {
   const [showDepartementDropDown, setShowDepartementDropDown] = useState(false);
   const [showFiliereDropDown, setShowFiliereDropDown] = useState(false);
   const [showNiveauDropDown, setShowNiveauDropDown] = useState(false);
+
   const [faculty, setFaculty] = useState<string>("");
   const [departement, setDepartement] = useState<string>("");
   const [filiere, setFiliere] = useState<string>("");
   const [niveau, setNiveau] = useState<string>("");
-  const faculteData = useFaculteList();
-  const departementData = useDepartementList();
-  const niveauData = useNiveauList();
-  const filiereData = useFiliereList();
+
+  const { data: facList = [], isLoading: facLoading } = useFacultyList();
+  const { data: depList = [], isLoading: depLoading } = useDepartementList();
+  const { data: filiereList = [], isLoading: filiereLoading } =
+    useFiliereList();
+  const { data: niveauList = [], isLoading: niveauLoading } = useNiveauList();
+  const createUser = CreateUser({
+    classe: {
+      departement_id: parseInt(departement),
+      faculte_id: parseInt(faculty),
+      filiere_id: parseInt(filiere),
+      niveau_id: parseInt(niveau),
+    },
+    email: email.value,
+    password: password.value,
+  });
+
+  const [deps, setDeps] = useState<
+    {
+      faculte_id: number;
+      id: number;
+      nom: string;
+    }[]
+  >([]);
+  const [filieres, setFilieres] = useState<
+    {
+      departement_id: number | null;
+      id: number;
+      nom: string;
+    }[]
+  >([]);
+  const [niveaux, setNiveaux] = useState<
+    {
+      id: number;
+      nom: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    if (facList.length > 0) {
+      const newListFaculty = facList.map((item) => ({
+        label: item.nom,
+        value: `${item.id}`,
+      }));
+      setListFaculty(newListFaculty);
+    }
+  }, [facList]);
+
+  useEffect(() => {
+    if (depList.length > 0 && faculty !== "") {
+      const l = depList.filter((d) => d.faculte_id === parseInt(faculty));
+      setDeps(l);
+    }
+  }, [faculty, depList]);
+
+  useEffect(() => {
+    if (filiereList.length > 0 && faculty !== "") {
+      const l = filiereList.filter((d) => d.faculte_id === parseInt(faculty));
+      setFilieres(l);
+    }
+  }, [faculty, filiereList]);
+
+  useEffect(() => {
+    if (niveauList.length > 0 && faculty !== "") {
+      const l = niveauList.filter((d) => d.faculte_id === parseInt(faculty));
+      setNiveaux(l);
+    }
+  }, [faculty, niveauList]);
+
+  const [listFaculty, setListFaculty] = useState<optionProps[]>([]);
+  const [listDepartement, setListDepartement] = useState<optionProps[]>([]);
+  const [listFiliere, setListFiliere] = useState<optionProps[]>([]);
+  const [listNiveau, setListNiveau] = useState<optionProps[]>([]);
+
+  useEffect(() => {
+    if (facList.length > 0) {
+      const newListFaculty = facList.map((item) => ({
+        label: item.nom,
+        value: `${item.id}`,
+      }));
+      setListFaculty(newListFaculty);
+    }
+  }, [facList]);
+
+  useEffect(() => {
+    if (deps.length > 0) {
+      const newListDepartement = deps.map((item) => ({
+        label: item.nom,
+        value: `${item.id}`,
+      }));
+      setListDepartement(newListDepartement);
+    }
+  }, [deps]);
+
+  useEffect(() => {
+    if (filieres.length > 0) {
+      const newListFiliere = filieres.map((item) => ({
+        label: item.nom,
+        value: `${item.id}`,
+      }));
+      setListFiliere(newListFiliere);
+    }
+  }, [filieres]);
+
+  useEffect(() => {
+    if (niveaux.length > 0) {
+      const newListNiveau = niveaux.map((item) => ({
+        label: item.nom,
+        value: `${item.id}`,
+      }));
+      setListNiveau(newListNiveau);
+    }
+  }, [niveaux]);
+
+  useEffect(() => {
+    if (createUser.isSuccess) {
+      setSession!(createUser.data.session);
+      router.navigate("/admin");
+    }
+    if (createUser.isError) {
+      setStep(0);
+      Alert.alert("Erreur inconnue");
+    }
+  }, [createUser.isSuccess, createUser.isError]);
+
   const handlePress = () => {
     setStep((s) => s + 1);
   };
@@ -65,59 +187,8 @@ const login = () => {
       setStep(0);
       return;
     }
-    handleSignUp()
-      .then(() => {
-        router.navigate("/admin");
-      })
-      .catch((e) => {
-        setStep(0);
-      });
+    createUser.mutate();
   };
-
-  const facultyList: optionProps[] = faculteData.data?.map((d) => ({
-    label: d.nom,
-    value: d.faculte_id,
-  }));
-  const departementList: optionProps[] = departementData.data?.map((d) => ({
-    label: d.nom,
-    value: d.departement_id,
-  }));
-  const niveauList: optionProps[] = niveauData.data?.map((d) => ({
-    label: d.nom,
-    value: d.id,
-  }));
-  const filiereList: optionProps[] = filiereData.data?.map((d) => ({
-    label: d.nom,
-    value: d.id,
-  }));
-
-  const handleSignUp = async () => {
-    setLoading(true);
-    const { error, data } = await supabase.auth.signUp({
-      email: email.value,
-      password: password.value,
-    });
-    if (error) {
-      Alert.alert(error.message);
-      if (isWeb) console.log(error.message);
-    } else {
-      //
-    }
-    setLoading(false);
-  };
-  if (
-    filiereData.isLoading ||
-    niveauData.isLoading ||
-    faculteData.isLoading ||
-    departementData.isLoading
-  ) {
-    return (
-      <View style={{ flex: 1, alignItems: "center" }}>
-        <Stack.Screen options={{ headerShown: false }} />
-        <ActivityIndicator size={"large"} style={{ flex: 1 }} />
-      </View>
-    );
-  }
   return (
     <Background>
       <Stack.Screen
@@ -165,7 +236,7 @@ const login = () => {
               onDismiss={() => setShowFacultyDropDown(false)}
               value={faculty}
               setValue={setFaculty}
-              list={facultyList}
+              list={listFaculty}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -182,7 +253,7 @@ const login = () => {
               onDismiss={() => setShowDepartementDropDown(false)}
               value={departement}
               setValue={setDepartement}
-              list={departementList}
+              list={listDepartement}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -195,7 +266,7 @@ const login = () => {
               onDismiss={() => setShowFiliereDropDown(false)}
               value={filiere}
               setValue={setFiliere}
-              list={filiereList}
+              list={listFiliere}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -208,7 +279,7 @@ const login = () => {
               onDismiss={() => setShowNiveauDropDown(false)}
               value={niveau}
               setValue={setNiveau}
-              list={niveauList}
+              list={listNiveau}
               dropDownStyle={{ width: "100%" }}
             />
           </View>
@@ -228,7 +299,7 @@ const login = () => {
         <Button
           mode="contained"
           onPress={() => (step == 0 ? handlePress() : checkSignUp())}
-          loading={loading}
+          loading={createUser.isLoading}
           style={{ borderRadius: 30, width: step == 1 ? "auto" : "100%" }}
         >
           {step === 0 ? "Suivant" : "Creer votre compte"}

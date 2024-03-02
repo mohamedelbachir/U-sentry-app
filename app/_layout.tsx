@@ -14,7 +14,7 @@ const RootLayout = () => {
     <PaperProvider theme={theme[colorScheme]}>
       <QueryProvider>
         <AuthProvider>
-          <Stack screenOptions={{ animation: "fade" }} />
+          <Stack screenOptions={{ animation: "fade", headerShown: false }} />
         </AuthProvider>
       </QueryProvider>
     </PaperProvider>

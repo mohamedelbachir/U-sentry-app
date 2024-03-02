@@ -1,18 +1,12 @@
-import { Redirect, Stack, router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import React from "react";
 import { Easing } from "react-native";
 import News from "./(screen)/News";
 import Notification from "./(screen)/Notification";
 import Account from "./(screen)/Account";
-import {
-  ActivityIndicator,
-  Appbar,
-  BottomNavigation,
-  Icon,
-} from "react-native-paper";
+import { Appbar, BottomNavigation, Icon } from "react-native-paper";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuth } from "@/provider/AuthProvider";
 type RoutesState = Array<{
   key: string;
   title: string;
@@ -48,7 +42,6 @@ const Admin = () => {
       key: "account",
       title: "Compte",
       titleInfo: "Profil",
-
       focusedIcon: "account",
       unfocusedIcon: "account-outline",
     },

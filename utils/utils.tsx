@@ -9,6 +9,7 @@ export const emailValidator = (email: string) => {
 
 export const passwordValidator = (password: string) => {
   if (!password || password.length <= 0) return "mot de passe requis.";
+  if (password.length < 6) return "mot de passe faible.";
 
   return "";
 };

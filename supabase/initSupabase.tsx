@@ -34,7 +34,7 @@ const ExpoStorage = {
 };
 export const supabase = createClient<Database>(supabaseURL, supabaseAnonKey, {
   auth: {
-    storage: AsyncStorage as any,
+    storage: ExpoStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

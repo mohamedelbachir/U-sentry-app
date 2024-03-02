@@ -9,28 +9,70 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin: {
+        Row: {
+          fonction: number
+          id: number
+          uuid: string
+        }
+        Insert: {
+          fonction: number
+          id?: number
+          uuid: string
+        }
+        Update: {
+          fonction?: number
+          id?: number
+          uuid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_admin_fonction_fkey"
+            columns: ["fonction"]
+            isOneToOne: false
+            referencedRelation: "facultes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_admin_uuid_fkey"
+            columns: ["uuid"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       alertes: {
         Row: {
+          content: string | null
           create_at: string | null
           description: string | null
+          hash: string | null
           id: number
           imageURL: string | null
+          target: Json | null
           title: string
           uuid: string
         }
         Insert: {
+          content?: string | null
           create_at?: string | null
           description?: string | null
+          hash?: string | null
           id?: number
           imageURL?: string | null
+          target?: Json | null
           title?: string
           uuid: string
         }
         Update: {
+          content?: string | null
           create_at?: string | null
           description?: string | null
+          hash?: string | null
           id?: number
           imageURL?: string | null
+          target?: Json | null
           title?: string
           uuid?: string
         }
@@ -58,7 +100,6 @@ export type Database = {
           filiere_id: number
           id: number
           niveau_id: number
-          uuid: string
         }
         Insert: {
           departement_id: number
@@ -66,7 +107,6 @@ export type Database = {
           filiere_id: number
           id?: number
           niveau_id: number
-          uuid: string
         }
         Update: {
           departement_id?: number
@@ -74,7 +114,6 @@ export type Database = {
           filiere_id?: number
           id?: number
           niveau_id?: number
-          uuid?: string
         }
         Relationships: [
           {
@@ -82,14 +121,14 @@ export type Database = {
             columns: ["departement_id"]
             isOneToOne: false
             referencedRelation: "departements"
-            referencedColumns: ["departement_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_classes_faculte_id_fkey"
             columns: ["faculte_id"]
             isOneToOne: false
             referencedRelation: "facultes"
-            referencedColumns: ["faculte_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_classes_id_fkey"
@@ -104,9 +143,61 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "niveaux"
             referencedColumns: ["id"]
+          }
+        ]
+      }
+      departements: {
+        Row: {
+          faculte_id: number
+          id: number
+          nom: string
+        }
+        Insert: {
+          faculte_id: number
+          id?: number
+          nom?: string
+        }
+        Update: {
+          faculte_id?: number
+          id?: number
+          nom?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_departements_faculte_id_fkey"
+            columns: ["faculte_id"]
+            isOneToOne: false
+            referencedRelation: "facultes"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      etudiants: {
+        Row: {
+          classe_id: number
+          id: number
+          uuid: string
+        }
+        Insert: {
+          classe_id: number
+          id?: number
+          uuid: string
+        }
+        Update: {
+          classe_id?: number
+          id?: number
+          uuid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_etudiant_classe_id_fkey"
+            columns: ["classe_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "public_classes_uuid_fkey"
+            foreignKeyName: "public_etudiant_uuid_fkey"
             columns: ["uuid"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -114,86 +205,129 @@ export type Database = {
           }
         ]
       }
-      departements: {
-        Row: {
-          departement_id: number
-          nom: string
-        }
-        Insert: {
-          departement_id?: number
-          nom?: string
-        }
-        Update: {
-          departement_id?: number
-          nom?: string
-        }
-        Relationships: []
-      }
       facultes: {
         Row: {
-          faculte_id: number
+          id: number
           nom: string
         }
         Insert: {
-          faculte_id?: number
+          id?: number
           nom: string
         }
         Update: {
-          faculte_id?: number
+          id?: number
           nom?: string
         }
         Relationships: []
       }
       filieres: {
         Row: {
+          departement_id: number
+          faculte_id: number
           id: number
           nom: string
         }
         Insert: {
+          departement_id: number
+          faculte_id: number
           id?: number
           nom: string
         }
         Update: {
+          departement_id?: number
+          faculte_id?: number
           id?: number
           nom?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_filieres_departement_id_fkey"
+            columns: ["departement_id"]
+            isOneToOne: false
+            referencedRelation: "departements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_filieres_faculte_id_fkey"
+            columns: ["faculte_id"]
+            isOneToOne: false
+            referencedRelation: "facultes"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       niveaux: {
         Row: {
+          departement_id: number
+          faculte_id: number
+          filiere_id: number
           id: number
           nom: string
         }
         Insert: {
+          departement_id: number
+          faculte_id: number
+          filiere_id: number
           id?: number
           nom?: string
         }
         Update: {
+          departement_id?: number
+          faculte_id?: number
+          filiere_id?: number
           id?: number
           nom?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_niveaux_departement_id_fkey"
+            columns: ["departement_id"]
+            isOneToOne: false
+            referencedRelation: "departements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_niveaux_faculte_id_fkey"
+            columns: ["faculte_id"]
+            isOneToOne: false
+            referencedRelation: "facultes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_niveaux_filiere_id_fkey"
+            columns: ["filiere_id"]
+            isOneToOne: false
+            referencedRelation: "filieres"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       profiles: {
         Row: {
           avatar_url: string | null
+          email: string | null
           full_name: string | null
           id: string
           role: string
+          user_metadata: Json | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          email?: string | null
           full_name?: string | null
           id: string
           role?: string
+          user_metadata?: Json | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
           role?: string
+          user_metadata?: Json | null
           username?: string | null
         }
         Relationships: [
@@ -202,41 +336,6 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      publications: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: number
-          imageURL: string | null
-          title: string
-          uuid: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: number
-          imageURL?: string | null
-          title: string
-          uuid: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: number
-          imageURL?: string | null
-          title?: string
-          uuid?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_publications_uuid_fkey"
-            columns: ["uuid"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
