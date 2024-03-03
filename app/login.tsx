@@ -8,12 +8,14 @@ import TextInput from "@/components/TextInput";
 import BackButton from "@/components/BackButton";
 import { useTheme } from "react-native-paper";
 import { emailValidator, passwordValidator } from "@/utils/utils";
-import { Stack, router } from "expo-router";
+import { Redirect, Stack, router } from "expo-router";
 import { supabase } from "@/supabase/initSupabase";
 import { isWeb } from "@/utils/utility";
+import { useAuth } from "@/provider/AuthProvider";
 
 const login = () => {
   const theme = useTheme();
+  const { session } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
@@ -42,7 +44,9 @@ const login = () => {
     }
     setLoading(false);
   };
-
+  if (session != null) {
+    return <Redirect href={"/admin/"} />;
+  }
   return (
     <Background>
       <Stack.Screen

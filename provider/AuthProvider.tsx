@@ -1,4 +1,5 @@
 import { supabase } from "@/supabase/initSupabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session } from "@supabase/supabase-js";
 import {
   PropsWithChildren,
@@ -13,6 +14,7 @@ type AuthType = {
   loading: boolean;
   setSession?: (session: Session | null) => void;
   classeId?: number;
+  setClasse?: (v: number) => void;
 };
 
 const AuthContext = createContext<AuthType>({ session: null, loading: true });
@@ -55,7 +57,13 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
   return (
     <AuthContext.Provider
-      value={{ session, loading, setSession: setSession, classeId: classe! }}
+      value={{
+        session,
+        loading,
+        setSession: setSession,
+        classeId: classe!,
+        setClasse,
+      }}
     >
       {children}
     </AuthContext.Provider>

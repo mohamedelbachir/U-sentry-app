@@ -35,7 +35,7 @@ export default function ScreenWrapper({
       backgroundColor: theme.colors.background,
       paddingBottom: insets.bottom,
       paddingLeft: insets.left,
-      paddingRight: insets.left,
+      paddingRight: insets.right,
     },
   ];
 

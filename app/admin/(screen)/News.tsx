@@ -1,38 +1,39 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import React from "react";
 import ScreenWrapper from "@/utils/screenWrapper";
-import { FAB, useTheme, ActivityIndicator } from "react-native-paper";
+import { FAB, ActivityIndicator } from "react-native-paper";
 import { router } from "expo-router";
 import CardPost from "@/components/CardPox";
 import { usePostList } from "@/app/api/post";
 const News = () => {
-  const theme = useTheme();
   const postData = usePostList();
   return (
     <>
-      <ScreenWrapper style={{ flex: 1 }}>
-        {postData.isLoading && (
-          <View>
-            <ActivityIndicator
-              style={{ justifyContent: "center", marginTop: 30 }}
-              size={"large"}
-            />
-          </View>
-        )}
-        {postData.data && (
-          <View
-            style={[
-              styles.container,
-              { backgroundColor: theme.colors?.background },
-            ]}
-          >
-            {postData.data.map((d, i) => (
-              <CardPost {...d} key={i} />
-            ))}
-          </View>
-        )}
-      </ScreenWrapper>
-      {!postData.isLoading && (
+      {postData.isLoading && (
+        <View style={styles.container}>
+          <ActivityIndicator
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              flex: 1,
+            }}
+            size={"large"}
+          />
+        </View>
+      )}
+      {postData.data && (
+        <ScreenWrapper>
+          {postData.data.map((d, i) => (
+            <CardPost {...d} key={i} />
+          ))}
+        </ScreenWrapper>
+      )}
+      {postData.isError && (
+        <View style={styles.container}>
+          <Text>Erreur de chargement des actu ..</Text>
+        </View>
+      )}
+      {postData.data && (
         <FAB
           icon="magnify"
           onPress={() => {
@@ -48,6 +49,8 @@ const News = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
     padding: 4,

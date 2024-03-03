@@ -1,4 +1,6 @@
+import { useAuth } from "@/provider/AuthProvider";
 import { supabase } from "@/supabase/initSupabase";
+import { Json } from "@/supabase/supabase";
 import { useQuery, useMutation } from "react-query";
 export const usePostList = () => {
   return useQuery({
@@ -10,6 +12,61 @@ export const usePostList = () => {
       }
       const alertList = data.filter((f) => f.target === null);
       return alertList;
+    },
+  });
+};
+
+export const useUserList = () => {
+  return useQuery({
+    queryKey: ["user-list"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("*");
+      if (error) {
+        throw new Error();
+      }
+      return data;
+    },
+  });
+};
+
+export const useUserNotification = () => {
+  return useQuery({
+    queryKey: ["notification-list"],
+    queryFn: async () => {
+      async () => {
+        const { data, error } = await supabase.from("alertes").select("*");
+        if (error) {
+          throw new Error();
+        }
+        let result = data.filter((d) => {
+          if (d.target == null) {
+            return;
+          }
+          return d.target;
+        });
+        console.log(result);
+        return result;
+      };
+    },
+  });
+};
+
+export const useUserClassInfo = () => {
+  const { classeId } = useAuth();
+  return useQuery({
+    queryKey: ["class-info"],
+    queryFn: async () => {
+      async () => {
+        const { data, error } = await supabase
+          .from("classes")
+          .select("*")
+          .eq("id", classeId!)
+          .single();
+        if (error) {
+          throw new Error();
+        }
+        return data;
+      };
     },
   });
 };

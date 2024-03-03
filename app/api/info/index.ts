@@ -1,5 +1,6 @@
 import { useQuery } from "react-query";
 import { supabase } from "@/supabase/initSupabase";
+import { useState } from "react";
 
 type departementType = {
   facId: number;
@@ -19,6 +20,30 @@ type adminProps = {
   mdp: string;
   role: number;
   name: string;
+};
+
+type classInfo = {
+  faculty?: string;
+  departement?: string;
+  filiere?: string;
+  niveau?: string;
+};
+export const useClassInformationList = (id: string) => {
+  return useQuery({
+    queryKey: ["class-info", id],
+    queryFn: async () => {
+      const { data: classData, error: classError } = await supabase
+        .from("etudiants")
+        .select("*")
+        .eq("uuid", id)
+        .single();
+
+      if (classError) {
+        throw new Error(classError.message);
+      }
+      return classData;
+    },
+  });
 };
 export const useFacultyList = () => {
   return useQuery({

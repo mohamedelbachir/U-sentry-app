@@ -46,6 +46,10 @@ const login = () => {
   const { data: filiereList = [], isLoading: filiereLoading } =
     useFiliereList();
   const { data: niveauList = [], isLoading: niveauLoading } = useNiveauList();
+  const [listFaculty, setListFaculty] = useState<optionProps[]>([]);
+  const [listDepartement, setListDepartement] = useState<optionProps[]>([]);
+  const [listFiliere, setListFiliere] = useState<optionProps[]>([]);
+  const [listNiveau, setListNiveau] = useState<optionProps[]>([]);
   const createUser = CreateUser({
     classe: {
       departement_id: parseInt(departement),
@@ -55,6 +59,12 @@ const login = () => {
     },
     email: email.value,
     password: password.value,
+    infoClass: {
+      fac: listFaculty.filter((f) => f.value === faculty)[0]?.label,
+      niv: listNiveau.filter((f) => f.value === niveau)[0]?.label,
+      dep: listDepartement.filter((f) => f.value === departement)[0]?.label,
+      fil: listFiliere.filter((f) => f.value === filiere)[0]?.label,
+    },
   });
 
   const [deps, setDeps] = useState<
@@ -108,11 +118,6 @@ const login = () => {
       setNiveaux(l);
     }
   }, [faculty, niveauList]);
-
-  const [listFaculty, setListFaculty] = useState<optionProps[]>([]);
-  const [listDepartement, setListDepartement] = useState<optionProps[]>([]);
-  const [listFiliere, setListFiliere] = useState<optionProps[]>([]);
-  const [listNiveau, setListNiveau] = useState<optionProps[]>([]);
 
   useEffect(() => {
     if (facList.length > 0) {

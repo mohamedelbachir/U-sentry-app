@@ -1,5 +1,7 @@
+import { useAuth } from "@/provider/AuthProvider";
 import { supabase } from "@/supabase/initSupabase";
 import { Tables } from "@/types/utils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 type userId = {
@@ -76,6 +78,12 @@ interface User {
   email: string;
   password: string;
   classe: userClass;
+  infoClass?: {
+    fac: string;
+    dep: string;
+    fil: string;
+    niv: string;
+  };
 }
 
 const createUser = async (user: User) => {
@@ -92,6 +100,7 @@ const createUser = async (user: User) => {
 };
 
 export function CreateUser(user: User) {
+  const { setClasse } = useAuth();
   return useMutation(() => createUser(user), {
     onSuccess: async (data) => {
       const { data: insertData, error: insertError } = await supabase
@@ -110,15 +119,24 @@ export function CreateUser(user: User) {
       if (insertError) {
         throw insertError;
       }
+
       const { data: result, error: failResult } = await supabase
         .from("etudiants")
         .insert({
           classe_id: insertData.id,
           uuid: data.user?.id!,
-        });
+          dep: user.infoClass?.dep,
+          fac: user.infoClass?.fac,
+          fil: user.infoClass?.fil,
+          niv: user.infoClass?.niv,
+        })
+        .select()
+        .single();
       if (failResult) {
         throw failResult;
       }
+      setClasse!(result.classe_id);
+      AsyncStorage.setItem("isLogIn", JSON.stringify(true));
       return result;
     },
   });

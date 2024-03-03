@@ -115,36 +115,7 @@ export type Database = {
           id?: number
           niveau_id?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_classes_departement_id_fkey"
-            columns: ["departement_id"]
-            isOneToOne: false
-            referencedRelation: "departements"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_classes_faculte_id_fkey"
-            columns: ["faculte_id"]
-            isOneToOne: false
-            referencedRelation: "facultes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_classes_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "filieres"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_classes_niveau_id_fkey"
-            columns: ["niveau_id"]
-            isOneToOne: false
-            referencedRelation: "niveaux"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
       departements: {
         Row: {
@@ -175,17 +146,29 @@ export type Database = {
       etudiants: {
         Row: {
           classe_id: number
+          dep: string | null
+          fac: string | null
+          fil: string | null
           id: number
+          niv: string | null
           uuid: string
         }
         Insert: {
           classe_id: number
+          dep?: string | null
+          fac?: string | null
+          fil?: string | null
           id?: number
+          niv?: string | null
           uuid: string
         }
         Update: {
           classe_id?: number
+          dep?: string | null
+          fac?: string | null
+          fil?: string | null
           id?: number
+          niv?: string | null
           uuid?: string
         }
         Relationships: [
@@ -269,7 +252,7 @@ export type Database = {
           faculte_id: number
           filiere_id: number
           id?: number
-          nom?: string
+          nom: string
         }
         Update: {
           departement_id?: number
