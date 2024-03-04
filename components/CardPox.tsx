@@ -1,6 +1,6 @@
 import { StyleSheet, Text, Pressable, View } from "react-native";
 import { Image } from "expo-image";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { Card } from "react-native-paper";
 import { postType } from "@/utils/types";
@@ -17,6 +17,16 @@ const CardPost = ({
   create_at,
 }: postType) => {
   const users = useUserList();
+  const [timeDisplay, setTimeDisplay] = useState("");
+  useEffect(() => {
+    const subScribe = setInterval(() => {
+      setTimeDisplay(formatTimeDifference(create_at));
+    }, 1000);
+    return () => {
+      clearInterval(subScribe);
+    };
+  }, []);
+
   return (
     <Pressable
       onPress={() => router.push("/admin/post/" + id)}
@@ -28,13 +38,16 @@ const CardPost = ({
           source={imageURL}
           placeholder={hash}
           contentFit="cover"
-          transition={1000}
+          transition={200}
         />
         <Card.Title
           title={title}
           titleVariant="titleMedium"
           subtitleVariant="titleMedium"
           subtitleNumberOfLines={2}
+          titleStyle={{
+            marginTop: 10,
+          }}
           subtitleStyle={{
             marginTop: 5,
             marginBottom: 2,
@@ -55,9 +68,7 @@ const CardPost = ({
                     {users.data?.filter((d) => d.id == uuid)[0]?.username}
                   </Text>
                 </View>
-                <Text style={{ fontStyle: "italic" }}>
-                  {formatTimeDifference(create_at)}
-                </Text>
+                <Text style={{ fontStyle: "italic" }}>{timeDisplay}</Text>
               </View>
             ) : users.isLoading ? (
               <>
@@ -73,13 +84,12 @@ const CardPost = ({
           }
         />
         {description?.length! > 1 && (
-          <Card.Content>
+          <Card.Content style={{ marginTop: 20 }}>
             <Text
               textBreakStrategy="balanced"
               ellipsizeMode="middle"
               lineBreakMode="middle"
               numberOfLines={2}
-              style={{ marginTop: 10 }}
             >
               {description}
             </Text>

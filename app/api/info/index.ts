@@ -164,6 +164,23 @@ export const useAlertList = (id: string) => {
   });
 };
 
+export const useClassList = (id: number) => {
+  return useQuery({
+    queryKey: ["class-list", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("id", id);
+      if (error) {
+        //console.log(error);
+        throw new Error(error.message);
+      }
+      return data;
+    },
+  });
+};
+
 export const useProfileList = () => {
   return useQuery({
     queryKey: ["profile-list"],

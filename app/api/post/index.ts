@@ -6,7 +6,10 @@ export const usePostList = () => {
   return useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("alertes").select("*");
+      const { data, error } = await supabase
+        .from("alertes")
+        .select("*")
+        .order("create_at", { ascending: false });
       if (error) {
         throw new Error();
       }
@@ -33,20 +36,17 @@ export const useUserNotification = () => {
   return useQuery({
     queryKey: ["notification-list"],
     queryFn: async () => {
-      async () => {
-        const { data, error } = await supabase.from("alertes").select("*");
-        if (error) {
-          throw new Error();
+      const { data, error } = await supabase.from("alertes").select("*");
+      if (error) {
+        throw new Error();
+      }
+      let result = data.filter((d) => {
+        if (d.target == null) {
+          return;
         }
-        let result = data.filter((d) => {
-          if (d.target == null) {
-            return;
-          }
-          return d.target;
-        });
-        console.log(result);
-        return result;
-      };
+        return d.target;
+      });
+      return result;
     },
   });
 };
@@ -56,17 +56,15 @@ export const useUserClassInfo = () => {
   return useQuery({
     queryKey: ["class-info"],
     queryFn: async () => {
-      async () => {
-        const { data, error } = await supabase
-          .from("classes")
-          .select("*")
-          .eq("id", classeId!)
-          .single();
-        if (error) {
-          throw new Error();
-        }
-        return data;
-      };
+      const { data, error } = await supabase
+        .from("classes")
+        .select("*")
+        .eq("id", classeId!)
+        .single();
+      if (error) {
+        throw new Error();
+      }
+      return data;
     },
   });
 };

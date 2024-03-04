@@ -1,12 +1,32 @@
 import { View, StyleSheet, Text } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import ScreenWrapper from "@/utils/screenWrapper";
 import { FAB, ActivityIndicator } from "react-native-paper";
 import { router } from "expo-router";
 import CardPost from "@/components/CardPox";
 import { usePostList } from "@/app/api/post";
+import { supabase } from "@/supabase/initSupabase";
+import { useQueryClient } from "react-query";
 const News = () => {
   const postData = usePostList();
+  const clientQuery = useQueryClient();
+  useEffect(() => {
+    const alertes = supabase
+      .channel("custom-insert-channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "alertes" },
+        (payload) => {
+          clientQuery.invalidateQueries(["posts"]);
+          clientQuery.invalidateQueries(["user-list"]);
+          clientQuery.invalidateQueries(["notification-list"]);
+        }
+      )
+      .subscribe();
+    return () => {
+      alertes.unsubscribe();
+    };
+  }, []);
   return (
     <>
       {postData.isLoading && (
@@ -23,8 +43,8 @@ const News = () => {
       )}
       {postData.data && (
         <ScreenWrapper>
-          {postData.data.map((d, i) => (
-            <CardPost {...d} key={i} />
+          {postData.data.map((d) => (
+            <CardPost {...d} key={d.id} />
           ))}
         </ScreenWrapper>
       )}
